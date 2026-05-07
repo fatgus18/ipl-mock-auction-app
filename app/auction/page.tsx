@@ -6,7 +6,7 @@ export const revalidate = 60;
 // List the EXACT names of the sheets you want to pull for the auction categories
 const AUCTION_SETS = [
   "MARQUEE SET",
-  "BATTER SET 1",
+  "BATTERS SET 1",
   "BOWLERS SET 1",
   "ALL ROUNDERS SET 1",
   "WICKET KEEPERS SET 1",
