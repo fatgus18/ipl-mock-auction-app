@@ -1,31 +1,28 @@
 import { getSheetData } from '@/lib/googleSheets';
+import DashboardTabs from '@/components/DashboardTabs';
 
-// This tells Vercel to fetch fresh data from your sheet every 60 seconds
 export const revalidate = 60; 
 
 export default async function Home() {
-  // Fetch Leaderboard from Column J
-  const leaderboardData = await getSheetData('POINTS!J1:J10');
-  
-  return (
-    <main className="min-h-screen bg-slate-50 p-4 md:p-10">
-      <div className="max-w-7xl mx-auto space-y-8">
-        
-        {/* Leaderboard Section */}
-        <section className="bg-white rounded-xl shadow-sm p-6 border border-slate-100">
-          <h1 className="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">
-            Overall Leaderboard
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {leaderboardData?.slice(1).map((row, idx) => (
-              <div key={idx} className="p-4 bg-slate-50 rounded-lg border flex justify-between items-center">
-                <span className="font-semibold text-slate-700">{row[0].split(':')[0]}</span>
-                <span className="text-lg font-bold text-emerald-600">{row[0].split(':')[1]}</span>
-              </div>
-            ))}
-          </div>
-        </section>
+  // Fetch everything we need in one go
+  const leaderboardData = await getSheetData('POINTS!J1:J10') || [];
+  const avgPtsData = await getSheetData('POINTS!J11:J20') || [];
 
+  return (
+    <main className="min-h-screen bg-gray-950 text-gray-100 p-4 md:p-8 font-sans selection:bg-indigo-500 selection:text-white">
+      <div className="max-w-7xl mx-auto space-y-6">
+        <header className="border-b border-gray-800 pb-4 mb-8">
+          <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 tracking-tight">
+            IPL 2026 Mock Auction
+          </h1>
+          <p className="text-gray-400 mt-2 font-medium tracking-wide">LIVE TOURNAMENT DASHBOARD</p>
+        </header>
+
+        {/* The interactive tab component */}
+        <DashboardTabs 
+          leaderboard={leaderboardData}
+          avgPts={avgPtsData}
+        />
       </div>
     </main>
   );
