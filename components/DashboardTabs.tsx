@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 interface DashboardProps {
+  top20MVP: (string | number)[][];
   leaderboard: (string | number)[][];
   avgPts: (string | number)[][];
   orangeCap: (string | number)[][];
@@ -13,6 +14,7 @@ interface DashboardProps {
 }
 
 export default function DashboardTabs({ 
+  top20MVP,
   leaderboard, 
   avgPts, 
   orangeCap, 
@@ -50,34 +52,53 @@ export default function DashboardTabs({
 
       {/* Tab Content: LEADERBOARDS */}
       {activeTab === 'leaderboard' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* TOP 20 MVP */}
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overall Leaderboard</h2>
-            <div className="space-y-3">
-              {leaderboard.slice(1).map((row: (string | number)[], idx: number) => (
-                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
-                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
-                    {String(row[0]).split(':')[0]}
-                  </span>
-                  <span className="font-black text-emerald-400 text-xl">{String(row[0]).split(':')[1]}</span>
-                </div>
-              ))}
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">🌟 Top 20 MVP</h2>
+            <div className="space-y-2">
+              {top20MVP.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || String(row[0]).toLowerCase() === '---') return null;
+                return (
+                  <div key={idx} className="flex items-start gap-2 p-2 bg-gray-800/40 rounded-lg hover:bg-gray-800/60 transition text-sm">
+                    <span className="font-bold text-cyan-400 min-w-[20px]">{idx}.</span>
+                    <span className="text-gray-300">{String(row[0])}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Avg Pts/Mat</h2>
-            <div className="space-y-3">
-              {avgPts.slice(1).map((row: (string | number)[], idx: number) => (
-                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
-                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
-                    {String(row[0]).split(':')[0]}
-                  </span>
-                  <span className="font-black text-cyan-400 text-xl">{String(row[0]).split(':')[1]}</span>
-                </div>
-              ))}
+          {/* Overall Leaderboard + Avg Pts/Mat */}
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overall Leaderboard</h2>
+              <div className="space-y-3">
+                {leaderboard.slice(1).map((row: (string | number)[], idx: number) => (
+                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                      <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
+                      {String(row[0]).split(':')[0]}
+                    </span>
+                    <span className="font-black text-emerald-400 text-xl">{String(row[0]).split(':')[1]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Avg Pts/Mat</h2>
+              <div className="space-y-3">
+                {avgPts.slice(1).map((row: (string | number)[], idx: number) => (
+                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                      <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
+                      {String(row[0]).split(':')[0]}
+                    </span>
+                    <span className="font-black text-cyan-400 text-xl">{String(row[0]).split(':')[1]}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

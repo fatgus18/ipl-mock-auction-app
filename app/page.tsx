@@ -5,8 +5,9 @@ export const revalidate = 60;
 
 export default async function Home() {
   // Fetch everything we need in one go
-  const leaderboardData = await getSheetData('POINTS!A1:B10') || [];
-  const avgPtsData = await getSheetData('POINTS!A1:B20') || [];
+  const top20MVPData = await getSheetData('POINTS!I1:I22') || [];
+  const leaderboardData = await getSheetData('POINTS!J1:J10') || [];
+  const avgPtsData = await getSheetData('POINTS!J11:J20') || [];
   const orangeCapData = await getSheetData('POINTS!F103:F115') || [];
   const purpleCapData = await getSheetData('POINTS!I103:I115') || [];
   const valuSigningsData = await getSheetData('POINTS!F83:F95') || [];
@@ -25,6 +26,7 @@ export default async function Home() {
 
         {/* The interactive tab component */}
         <DashboardTabs 
+          top20MVP={top20MVPData}
           leaderboard={leaderboardData}
           avgPts={avgPtsData}
           orangeCap={orangeCapData}
