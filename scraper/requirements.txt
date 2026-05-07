@@ -1,0 +1,8 @@
+pandas
+gspread
+oauth2client
+fuzzywuzzy
+python-Levenshtein
+selenium
+webdriver-manager
+lxml

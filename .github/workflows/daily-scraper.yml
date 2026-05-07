@@ -1,0 +1,34 @@
+name: IPL Daily Scraper
+
+on:
+  schedule:
+    # This is 1:30 AM UTC, which is exactly 7:00 AM IST (Bengaluru time)
+    - cron: '30 1 * * *'
+  workflow_dispatch: # Allows you to trigger it manually by clicking a button
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          cd scraper
+          pip install -r requirements.txt
+
+      - name: Create Credentials File
+        run: |
+          cd scraper
+          echo "${{ secrets.GCP_CREDENTIALS }}" > credentials.json
+
+      - name: Run Scraper
+        run: |
+          cd scraper
+          python update_mvp_test.py
