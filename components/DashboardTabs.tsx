@@ -2,12 +2,29 @@
 
 import { useState } from 'react';
 
-export default function DashboardTabs({ leaderboard, avgPts }: { leaderboard: (string | number)[][]; avgPts: (string | number)[][] }) {
+interface DashboardProps {
+  leaderboard: (string | number)[][];
+  avgPts: (string | number)[][];
+  orangeCap: (string | number)[][];
+  purpleCap: (string | number)[][];
+  valueSigings: (string | number)[][];
+  captainRegrets: (string | number)[][];
+  rosterDependency: (string | number)[][];
+}
+
+export default function DashboardTabs({ 
+  leaderboard, 
+  avgPts, 
+  orangeCap, 
+  purpleCap, 
+  valueSigings, 
+  captainRegrets, 
+  rosterDependency 
+}: DashboardProps) {
   const [activeTab, setActiveTab] = useState('leaderboard');
 
   const tabs = [
     { id: 'leaderboard', label: 'Leaderboards' },
-    { id: 'rosters', label: 'Franchise Rosters' },
     { id: 'cap-races', label: 'Cap Races' },
     { id: 'advanced', label: 'Advanced Analytics' }
   ];
@@ -37,40 +54,42 @@ export default function DashboardTabs({ leaderboard, avgPts }: { leaderboard: (s
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overall Leaderboard</h2>
             <div className="space-y-3">
-              {leaderboard.slice(1).map((row: (string | number)[], idx: number) => (
-                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
-                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
-                    {String(row[0]).split(':')[0]}
-                  </span>
-                  <span className="font-black text-emerald-400 text-xl">{String(row[0]).split(':')[1]}</span>
-                </div>
-              ))}
+              {leaderboard.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0]) return null;
+                const name = String(row[0]).split(':')[0] || String(row[0]);
+                const score = row[1];
+                return (
+                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition">
+                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                      <span className="text-gray-500 text-sm font-mono w-6">{idx + 1}.</span> 
+                      {name}
+                    </span>
+                    <span className="font-black text-emerald-400 text-xl">{score}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Avg Pts/Mat</h2>
             <div className="space-y-3">
-              {avgPts.slice(1).map((row: (string | number)[], idx: number) => (
-                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
-                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
-                    {String(row[0]).split(':')[0]}
-                  </span>
-                  <span className="font-black text-cyan-400 text-xl">{String(row[0]).split(':')[1]}</span>
-                </div>
-              ))}
+              {avgPts.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0]) return null;
+                const name = String(row[0]).split(':')[0] || String(row[0]);
+                const score = row[1];
+                return (
+                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition">
+                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                      <span className="text-gray-500 text-sm font-mono w-6">{idx + 1}.</span> 
+                      {name}
+                    </span>
+                    <span className="font-black text-cyan-400 text-xl">{score}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Tab Content: ROSTERS */}
-      {activeTab === 'rosters' && (
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl overflow-x-auto">
-          <h2 className="text-xl font-bold text-white mb-4">Drafted Squads</h2>
-          <p className="text-gray-500 italic mb-4">Roster mapping goes here (You can build a grid mapping columns A to D over the roster data).</p>
         </div>
       )}
 
@@ -78,14 +97,33 @@ export default function DashboardTabs({ leaderboard, avgPts }: { leaderboard: (s
       {activeTab === 'cap-races' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-gray-900 rounded-xl border border-orange-900/30 p-6 shadow-2xl">
-             <h2 className="text-xl font-bold text-orange-400 mb-4 border-b border-gray-800 pb-2">Orange Cap</h2>
-             {/* Map over Orange cap data from statsF */}
-             <p className="text-gray-500 italic">Orange cap top 10 maps here.</p>
+            <h2 className="text-xl font-bold text-orange-400 mb-4 border-b border-gray-800 pb-2">🏏 Orange Cap (Most Runs)</h2>
+            <div className="space-y-2">
+              {orangeCap.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || String(row[0]).toLowerCase() === 'none') return null;
+                const display = String(row[0]);
+                return (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-orange-900/20 rounded-lg border border-orange-900/20 hover:border-orange-700/50 transition">
+                    <span className="text-sm text-gray-300 font-semibold">{display}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
+
           <div className="bg-gray-900 rounded-xl border border-purple-900/30 p-6 shadow-2xl">
-             <h2 className="text-xl font-bold text-purple-400 mb-4 border-b border-gray-800 pb-2">Purple Cap</h2>
-             {/* Map over Purple cap data from statsI */}
-             <p className="text-gray-500 italic">Purple cap top 10 maps here.</p>
+            <h2 className="text-xl font-bold text-purple-400 mb-4 border-b border-gray-800 pb-2">🎯 Purple Cap (Most Wickets)</h2>
+            <div className="space-y-2">
+              {purpleCap.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || String(row[0]).toLowerCase() === 'none') return null;
+                const display = String(row[0]);
+                return (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-purple-900/20 rounded-lg border border-purple-900/20 hover:border-purple-700/50 transition">
+                    <span className="text-sm text-gray-300 font-semibold">{display}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -93,18 +131,50 @@ export default function DashboardTabs({ leaderboard, avgPts }: { leaderboard: (s
       {/* Tab Content: ADVANCED ANALYTICS */}
       {activeTab === 'advanced' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Value Signings</h2>
-             <p className="text-gray-500 italic">Best ROI and Worst Duds map here.</p>
-           </div>
-           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Captaincy Regret</h2>
-             <p className="text-gray-500 italic">Regret Index maps here.</p>
-           </div>
-           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Roster Dependency</h2>
-             <p className="text-gray-500 italic">Hardest Carry & Top Order maps here.</p>
-           </div>
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">💰 Value Signings</h2>
+            <div className="space-y-2 text-sm">
+              {valueSigings.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || idx > 9) return null;
+                const display = String(row[0]);
+                return (
+                  <div key={idx} className="p-2 bg-green-900/20 rounded border border-green-900/30 text-green-300">
+                    {display}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">😰 Captaincy Regret</h2>
+            <div className="space-y-2 text-sm">
+              {captainRegrets.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || idx > 9) return null;
+                const display = String(row[0]);
+                return (
+                  <div key={idx} className="p-2 bg-red-900/20 rounded border border-red-900/30 text-red-300">
+                    {display}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">🏗️ Roster Dependency</h2>
+            <div className="space-y-2 text-sm">
+              {rosterDependency.slice(1).map((row: (string | number)[], idx: number) => {
+                if (!row[0] || idx > 9) return null;
+                const display = String(row[0]);
+                return (
+                  <div key={idx} className="p-2 bg-blue-900/20 rounded border border-blue-900/30 text-blue-300">
+                    {display}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </div>

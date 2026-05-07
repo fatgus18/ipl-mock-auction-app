@@ -5,8 +5,13 @@ export const revalidate = 60;
 
 export default async function Home() {
   // Fetch everything we need in one go
-  const leaderboardData = await getSheetData('POINTS!J1:J10') || [];
-  const avgPtsData = await getSheetData('POINTS!J11:J20') || [];
+  const leaderboardData = await getSheetData('POINTS!A1:B10') || [];
+  const avgPtsData = await getSheetData('POINTS!A1:B20') || [];
+  const orangeCapData = await getSheetData('POINTS!F103:F115') || [];
+  const purpleCapData = await getSheetData('POINTS!I103:I115') || [];
+  const valuSigningsData = await getSheetData('POINTS!F83:F95') || [];
+  const captainRegretsData = await getSheetData('POINTS!F116:F130') || [];
+  const rosterDependencyData = await getSheetData('POINTS!I59:I75') || [];
 
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100 p-4 md:p-8 font-sans selection:bg-indigo-500 selection:text-white">
@@ -22,6 +27,11 @@ export default async function Home() {
         <DashboardTabs 
           leaderboard={leaderboardData}
           avgPts={avgPtsData}
+          orangeCap={orangeCapData}
+          purpleCap={purpleCapData}
+          valueSigings={valuSigningsData}
+          captainRegrets={captainRegretsData}
+          rosterDependency={rosterDependencyData}
         />
       </div>
     </main>
