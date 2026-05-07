@@ -54,40 +54,30 @@ export default function DashboardTabs({
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overall Leaderboard</h2>
             <div className="space-y-3">
-              {leaderboard.slice(1).map((row: (string | number)[], idx: number) => {
-                if (!row[0]) return null;
-                const name = String(row[0]).split(':')[0] || String(row[0]);
-                const score = row[1];
-                return (
-                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition">
-                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                      <span className="text-gray-500 text-sm font-mono w-6">{idx + 1}.</span> 
-                      {name}
-                    </span>
-                    <span className="font-black text-emerald-400 text-xl">{score}</span>
-                  </div>
-                );
-              })}
+              {leaderboard.slice(1).map((row: (string | number)[], idx: number) => (
+                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
+                    {String(row[0]).split(':')[0]}
+                  </span>
+                  <span className="font-black text-emerald-400 text-xl">{String(row[0]).split(':')[1]}</span>
+                </div>
+              ))}
             </div>
           </div>
 
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Avg Pts/Mat</h2>
             <div className="space-y-3">
-              {avgPts.slice(1).map((row: (string | number)[], idx: number) => {
-                if (!row[0]) return null;
-                const name = String(row[0]).split(':')[0] || String(row[0]);
-                const score = row[1];
-                return (
-                  <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg hover:bg-gray-800 transition">
-                    <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
-                      <span className="text-gray-500 text-sm font-mono w-6">{idx + 1}.</span> 
-                      {name}
-                    </span>
-                    <span className="font-black text-cyan-400 text-xl">{score}</span>
-                  </div>
-                );
-              })}
+              {avgPts.slice(1).map((row: (string | number)[], idx: number) => (
+                <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
+                  <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
+                    <span className="text-gray-500 text-sm font-mono w-4">{idx + 1}.</span> 
+                    {String(row[0]).split(':')[0]}
+                  </span>
+                  <span className="font-black text-cyan-400 text-xl">{String(row[0]).split(':')[1]}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
