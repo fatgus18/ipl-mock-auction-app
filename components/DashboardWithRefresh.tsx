@@ -7,6 +7,8 @@ import RefreshButton from './RefreshButton';
 interface DashboardWithRefreshProps {
   initialData: {
     top20MVP: (string | number)[][];
+    teamList: (string | number)[][];
+    advancedAnalytics: (string | number)[][];
     leaderboard: (string | number)[][];
     avgPts: (string | number)[][];
     orangeCap: (string | number)[][];
@@ -32,6 +34,8 @@ export default function DashboardWithRefresh({ initialData }: DashboardWithRefre
       </div>
       <DashboardTabs
         top20MVP={data.top20MVP}
+        teamList={data.teamList}
+        advancedAnalytics={data.advancedAnalytics}
         leaderboard={data.leaderboard}
         avgPts={data.avgPts}
         orangeCap={data.orangeCap}

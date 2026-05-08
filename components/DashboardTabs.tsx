@@ -4,6 +4,8 @@ import { useState } from 'react';
 
 interface DashboardProps {
   top20MVP: (string | number)[][];
+  teamList: (string | number)[][];
+  advancedAnalytics: (string | number)[][];
   leaderboard: (string | number)[][];
   avgPts: (string | number)[][];
   orangeCap: (string | number)[][];
@@ -15,6 +17,8 @@ interface DashboardProps {
 
 export default function DashboardTabs({ 
   top20MVP,
+  teamList,
+  advancedAnalytics,
   leaderboard, 
   avgPts, 
   orangeCap, 
@@ -27,9 +31,43 @@ export default function DashboardTabs({
 
   const tabs = [
     { id: 'leaderboard', label: 'Leaderboards' },
+    { id: 'teams', label: 'The Teams' },
     { id: 'cap-races', label: 'Cap Races' },
     { id: 'advanced', label: 'Advanced Analytics' }
   ];
+
+  const buildSections = (rows: (string | number)[][]) => {
+    const sections: { title: string; lines: string[] }[] = [];
+    let current = { title: '', lines: [] as string[] };
+
+    rows.forEach((row) => {
+      const text = row.map((cell) => String(cell || '').trim()).filter(Boolean).join(' ');
+      if (!text) {
+        if (current.lines.length > 0) {
+          sections.push(current);
+          current = { title: '', lines: [] };
+        }
+        return;
+      }
+
+      if (text.startsWith('---')) {
+        if (current.lines.length > 0) {
+          sections.push(current);
+        }
+        current = { title: text.replace(/-+/g, '').trim(), lines: [] };
+      } else {
+        current.lines.push(text);
+      }
+    });
+
+    if (current.lines.length > 0) {
+      sections.push(current);
+    }
+
+    return sections;
+  };
+
+  const analyticsSections = buildSections(advancedAnalytics);
 
   return (
     <div className="space-y-6">
@@ -104,6 +142,36 @@ export default function DashboardTabs({
         </div>
       )}
 
+      {/* Tab Content: TEAMS */}
+      {activeTab === 'teams' && (
+        <div className="space-y-6">
+          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">🏷️ The Teams</h2>
+            <div className="max-h-[70vh] overflow-y-auto pr-2 text-sm font-mono leading-6 text-gray-300">
+              {teamList.length > 0 ? (
+                teamList.map((row: (string | number)[], idx: number) => {
+                  const line = row.map((cell) => String(cell || '').trim()).filter(Boolean).join(' ');
+                  if (!line) {
+                    return <div key={idx} className="h-3" />;
+                  }
+                  const isHeading = /^---/.test(line);
+                  return (
+                    <div
+                      key={idx}
+                      className={isHeading ? 'text-indigo-300 font-semibold py-0.5' : 'text-gray-300 py-0.5'}
+                    >
+                      {line}
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-gray-500">Team roster data is not available yet. Pull fresh data from the sheet or check the selected range.</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab Content: CAP RACES */}
       {activeTab === 'cap-races' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -141,50 +209,75 @@ export default function DashboardTabs({
 
       {/* Tab Content: ADVANCED ANALYTICS */}
       {activeTab === 'advanced' && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">💰 Value Signings</h2>
-            <div className="space-y-2 text-sm">
-              {valueSigings.slice(1).map((row: (string | number)[], idx: number) => {
-                if (!row[0] || idx > 9) return null;
-                const display = String(row[0]);
-                return (
-                  <div key={idx} className="p-2 bg-green-900/20 rounded border border-green-900/30 text-green-300">
-                    {display}
-                  </div>
-                );
-              })}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">💰 Value Signings</h2>
+              <div className="space-y-2 text-sm">
+                {valueSigings.slice(1).map((row: (string | number)[], idx: number) => {
+                  if (!row[0] || idx > 9) return null;
+                  const display = String(row[0]);
+                  return (
+                    <div key={idx} className="p-2 bg-green-900/20 rounded border border-green-900/30 text-green-300">
+                      {display}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">😰 Captaincy Regret</h2>
+              <div className="space-y-2 text-sm">
+                {captainRegrets.slice(1).map((row: (string | number)[], idx: number) => {
+                  if (!row[0] || idx > 9) return null;
+                  const display = String(row[0]);
+                  return (
+                    <div key={idx} className="p-2 bg-red-900/20 rounded border border-red-900/30 text-red-300">
+                      {display}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">🏗️ Roster Dependency</h2>
+              <div className="space-y-2 text-sm">
+                {rosterDependency.slice(1).map((row: (string | number)[], idx: number) => {
+                  if (!row[0] || idx > 9) return null;
+                  const display = String(row[0]);
+                  return (
+                    <div key={idx} className="p-2 bg-blue-900/20 rounded border border-blue-900/30 text-blue-300">
+                      {display}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">😰 Captaincy Regret</h2>
-            <div className="space-y-2 text-sm">
-              {captainRegrets.slice(1).map((row: (string | number)[], idx: number) => {
-                if (!row[0] || idx > 9) return null;
-                const display = String(row[0]);
-                return (
-                  <div key={idx} className="p-2 bg-red-900/20 rounded border border-red-900/30 text-red-300">
-                    {display}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {analyticsSections.length > 0 ? (
+              analyticsSections.map((section, sectionIdx) => (
+                <div key={sectionIdx} className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+                  <h3 className="text-lg font-bold text-white mb-3 border-b border-gray-800 pb-2">
+                    {section.title || `Section ${sectionIdx + 1}`}
+                  </h3>
+                  <div className="space-y-2 text-sm text-gray-300">
+                    {section.lines.map((line, lineIdx) => (
+                      <p key={lineIdx} className={/^---/.test(line) ? 'text-indigo-300 font-semibold' : ''}>
+                        {line}
+                      </p>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
-            <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">🏗️ Roster Dependency</h2>
-            <div className="space-y-2 text-sm">
-              {rosterDependency.slice(1).map((row: (string | number)[], idx: number) => {
-                if (!row[0] || idx > 9) return null;
-                const display = String(row[0]);
-                return (
-                  <div key={idx} className="p-2 bg-blue-900/20 rounded border border-blue-900/30 text-blue-300">
-                    {display}
-                  </div>
-                );
-              })}
-            </div>
+                </div>
+              ))
+            ) : (
+              <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
+                <p className="text-gray-500">Advanced analytics content is not available yet. Pull fresh data from the sheet to populate these sections.</p>
+              </div>
+            )}
           </div>
         </div>
       )}

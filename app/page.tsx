@@ -13,9 +13,13 @@ export default async function Home() {
   const valuSigningsData = await getSheetData('POINTS!F83:F95') || [];
   const captainRegretsData = await getSheetData('POINTS!F116:F130') || [];
   const rosterDependencyData = await getSheetData('POINTS!I59:I75') || [];
+  const teamListData = await getSheetData('POINTS!A1:A250') || [];
+  const advancedAnalyticsData = await getSheetData('POINTS!A1:J240') || [];
 
   const initialData = {
     top20MVP: top20MVPData,
+    teamList: teamListData,
+    advancedAnalytics: advancedAnalyticsData,
     leaderboard: leaderboardData,
     avgPts: avgPtsData,
     orangeCap: orangeCapData,
