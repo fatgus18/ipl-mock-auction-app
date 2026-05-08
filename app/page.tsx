@@ -4,25 +4,19 @@ import DashboardWithRefresh from '@/components/DashboardWithRefresh';
 export const revalidate = 60; 
 
 export default async function Home() {
-  // Fetch everything we need in one go
-  const top20MVPData = await getSheetData('POINTS!I1:I22') || [];
+  // Fetch broad columns so we don't rely on hardcoded row numbers that change during the auction!
   const leaderboardData = await getSheetData('POINTS!J1:J10') || [];
   const avgPtsData = await getSheetData('POINTS!J11:J20') || [];
-  const orangeCapData = await getSheetData('POINTS!F103:F115') || [];
-  const purpleCapData = await getSheetData('POINTS!I103:I115') || [];
-  const valuSigningsData = await getSheetData('POINTS!F83:F95') || [];
-  const captainRegretsData = await getSheetData('POINTS!F116:F130') || [];
-  const rosterDependencyData = await getSheetData('POINTS!I59:I75') || [];
+  const rostersData = await getSheetData('POINTS!A1:D200') || [];
+  const statsFData = await getSheetData('POINTS!F1:F200') || [];
+  const statsIData = await getSheetData('POINTS!I1:I200') || [];
 
   const initialData = {
-    top20MVP: top20MVPData,
     leaderboard: leaderboardData,
     avgPts: avgPtsData,
-    orangeCap: orangeCapData,
-    purpleCap: purpleCapData,
-    valueSigings: valuSigningsData,
-    captainRegrets: captainRegretsData,
-    rosterDependency: rosterDependencyData,
+    rosters: rostersData,
+    statsF: statsFData,
+    statsI: statsIData,
   };
 
   return (
@@ -35,7 +29,6 @@ export default async function Home() {
           <p className="text-gray-400 mt-2 font-medium tracking-wide">LIVE TOURNAMENT DASHBOARD</p>
         </header>
 
-        {/* The interactive tab component with refresh button */}
         <DashboardWithRefresh initialData={initialData} />
       </div>
     </main>

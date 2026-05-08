@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-// Strict typing to prevent Vercel Build Errors
+// Strict typing for Vercel
 export type SheetCell = string | number | null | undefined;
 export type SheetData = SheetCell[][];
 
@@ -126,7 +126,6 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
 
   return (
     <div className="space-y-6">
-      {/* Tab Navigation */}
       <div className="flex overflow-x-auto space-x-2 border-b border-gray-800 pb-2 scrollbar-hide">
         {tabs.map((tab) => (
           <button
