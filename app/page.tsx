@@ -1,5 +1,5 @@
 import { getSheetData } from '@/lib/googleSheets';
-import DashboardTabs from '@/components/DashboardTabs';
+import DashboardWithRefresh from '@/components/DashboardWithRefresh';
 
 export const revalidate = 60; 
 
@@ -14,6 +14,17 @@ export default async function Home() {
   const captainRegretsData = await getSheetData('POINTS!F116:F130') || [];
   const rosterDependencyData = await getSheetData('POINTS!I59:I75') || [];
 
+  const initialData = {
+    top20MVP: top20MVPData,
+    leaderboard: leaderboardData,
+    avgPts: avgPtsData,
+    orangeCap: orangeCapData,
+    purpleCap: purpleCapData,
+    valueSigings: valuSigningsData,
+    captainRegrets: captainRegretsData,
+    rosterDependency: rosterDependencyData,
+  };
+
   return (
     <main className="min-h-screen bg-gray-950 text-gray-100 p-4 md:p-8 font-sans selection:bg-indigo-500 selection:text-white">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -24,17 +35,8 @@ export default async function Home() {
           <p className="text-gray-400 mt-2 font-medium tracking-wide">LIVE TOURNAMENT DASHBOARD</p>
         </header>
 
-        {/* The interactive tab component */}
-        <DashboardTabs 
-          top20MVP={top20MVPData}
-          leaderboard={leaderboardData}
-          avgPts={avgPtsData}
-          orangeCap={orangeCapData}
-          purpleCap={purpleCapData}
-          valueSigings={valuSigningsData}
-          captainRegrets={captainRegretsData}
-          rosterDependency={rosterDependencyData}
-        />
+        {/* The interactive tab component with refresh button */}
+        <DashboardWithRefresh initialData={initialData} />
       </div>
     </main>
   );
