@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 
-// --- STRICT TYPESCRIPT INTERFACES ---
+// Strict typing to prevent Vercel Build Errors
+export type SheetCell = string | number | null | undefined;
+export type SheetData = SheetCell[][];
+
 export interface DashboardTabsProps {
-  leaderboard: string[][];
-  avgPts: string[][];
-  rosters: string[][];
-  statsF: string[][];
-  statsI: string[][];
+  leaderboard: SheetData;
+  avgPts: SheetData;
+  rosters: SheetData;
+  statsF: SheetData;
+  statsI: SheetData;
 }
 
 interface TeamPlayer {
@@ -46,13 +49,12 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
   let currentParticipant: string | null = null;
   let currentTeam: TeamPlayer[] = [];
 
-  (rosters || []).forEach((row: string[]) => {
+  (rosters || []).forEach((row: SheetCell[]) => {
     if (!row || row.length === 0 || !row[0]) return;
     const cell0 = row[0].toString().trim();
     const cell0Clean = cell0.replace('👑', '').trim().toUpperCase();
 
     if (participantsList.some(p => cell0Clean.includes(p))) {
-      // Save previous team if exists
       if (currentParticipant && currentTeam.length > 0) {
         parsedRosters.push({ name: currentParticipant, players: currentTeam });
       }
@@ -62,9 +64,9 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
     else if (cell0Clean.includes("TOTAL")) {
       currentTeam.push({ 
         name: cell0, 
-        pts: row[1] || '-', 
-        dev: row[2] || '-', 
-        avg: row[3] || '-', 
+        pts: row[1]?.toString() || '-', 
+        dev: row[2]?.toString() || '-', 
+        avg: row[3]?.toString() || '-', 
         isTotal: true 
       });
       if (currentParticipant) {
@@ -76,34 +78,31 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
     else if (currentParticipant) {
       currentTeam.push({ 
         name: cell0, 
-        pts: row[1] || '-', 
-        dev: row[2] || '-', 
-        avg: row[3] || '-', 
+        pts: row[1]?.toString() || '-', 
+        dev: row[2]?.toString() || '-', 
+        avg: row[3]?.toString() || '-', 
         isTotal: false 
       });
     }
   });
 
-  // Catch the last participant if "TOTAL" string was missing
   if (currentParticipant && currentTeam.length > 0) {
     parsedRosters.push({ name: currentParticipant, players: currentTeam });
   }
 
   // --- 2. DYNAMICALLY PARSE ADVANCED STATS ---
-  const parseBlocks = (colData: string[][]): AdvancedStatBlock[] => {
+  const parseBlocks = (colData: SheetData): AdvancedStatBlock[] => {
     const blocks: AdvancedStatBlock[] = [];
     let currentBlock: AdvancedStatBlock | null = null;
     
-    (colData || []).forEach(row => {
+    (colData || []).forEach((row) => {
       if (!row || row.length === 0 || !row[0]) return;
       const val = row[0].toString().trim();
       
-      // Look for the "--- TITLE ---" pattern
       if (val.startsWith("---") && val.includes("---")) {
         if (currentBlock) blocks.push(currentBlock);
         currentBlock = { title: val.replace(/---/g, '').trim(), subtitle: null, items: [] };
       } else if (currentBlock) {
-        // If it starts with parentheses, treat it as a subtitle
         if (val.startsWith("(") && val.endsWith(")") && currentBlock.items.length === 0) {
             currentBlock.subtitle = val;
         } else {
@@ -118,7 +117,6 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
   const allStatsF = parseBlocks(statsF || []);
   const allStatsI = parseBlocks(statsI || []);
   
-  // Separate Cap Races from General Advanced Stats
   const orangeCap = allStatsF.find(b => b.title.toUpperCase().includes("ORANGE CAP")) || allStatsI.find(b => b.title.toUpperCase().includes("ORANGE CAP"));
   const purpleCap = allStatsI.find(b => b.title.toUpperCase().includes("PURPLE CAP")) || allStatsF.find(b => b.title.toUpperCase().includes("PURPLE CAP"));
   
@@ -151,8 +149,8 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Overall Leaderboard</h2>
             <div className="space-y-3">
-              {(leaderboard || []).slice(1).map((row: string[], idx: number) => {
-                const parts = (row[0] || '').split(':');
+              {(leaderboard || []).slice(1).map((row: SheetCell[], idx: number) => {
+                const parts = (row[0]?.toString() || '').split(':');
                 return (
                   <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
                     <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
@@ -169,8 +167,8 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
           <div className="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
             <h2 className="text-xl font-bold text-white mb-4 border-b border-gray-800 pb-2">Avg Pts/Mat</h2>
             <div className="space-y-3">
-              {(avgPts || []).slice(1).map((row: string[], idx: number) => {
-                 const parts = (row[0] || '').split(':');
+              {(avgPts || []).slice(1).map((row: SheetCell[], idx: number) => {
+                 const parts = (row[0]?.toString() || '').split(':');
                  return (
                   <div key={idx} className="flex justify-between items-center p-3 bg-gray-800/50 rounded-lg">
                     <span className="font-semibold text-gray-200 text-lg flex items-center gap-2">
@@ -206,7 +204,6 @@ export default function DashboardTabs({ leaderboard, avgPts, rosters, statsF, st
                   </thead>
                   <tbody className="divide-y divide-gray-800/50">
                     {team.players.map((p, i) => {
-                      // Dynamically color the deviation cell (Red if negative, Green if positive)
                       const devVal = parseFloat(p.dev.toString());
                       const devColor = (!isNaN(devVal) && devVal < 0) ? 'text-red-400' : 'text-emerald-400';
 

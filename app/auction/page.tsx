@@ -3,7 +3,7 @@ import AuctionTabs from '@/components/AuctionTabs';
 
 export const revalidate = 60;
 
-// EXACT names of your sheets
+// EXACT names of your sheets in the Google Doc
 const AUCTION_SETS = [
   "MARQUEE SET",
   "BATTERS SET 1",

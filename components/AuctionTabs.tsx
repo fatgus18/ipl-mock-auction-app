@@ -2,11 +2,14 @@
 
 import { useState } from 'react';
 
-// --- STRICT TYPESCRIPT INTERFACES ---
+// Strict typing to prevent Vercel Build Errors
+export type SheetCell = string | number | null | undefined;
+export type SheetData = SheetCell[][];
+
 export interface AuctionSet {
   id: string;
   label: string;
-  players: string[][];
+  players: SheetData;
 }
 
 interface AuctionTabsProps {
@@ -27,17 +30,17 @@ export default function AuctionTabs({ sets }: AuctionTabsProps) {
     }
 
     // DYNAMICALLY FIND COLUMN INDICES BASED ON EXACT SHEET HEADERS
-    const headers = currentSet.players[0].map((h: string) => h ? h.toString().toUpperCase().trim() : '');
+    const headers = currentSet.players[0].map((h) => h ? h.toString().toUpperCase().trim() : '');
     
     // We assume Player Name is always Column 0
     const nameIdx = 0; 
     const roleIdx = headers.indexOf('ROLE');
-    const soldPriceIdx = headers.findIndex((h: string) => h.includes('SOLD PRICE'));
-    const soldToIdx = headers.findIndex((h: string) => h.includes('SOLD TO'));
+    const soldPriceIdx = headers.findIndex((h) => h.includes('SOLD PRICE'));
+    const soldToIdx = headers.findIndex((h) => h.includes('SOLD TO'));
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentSet.players.slice(1).map((player: string[], index: number) => {
+        {currentSet.players.slice(1).map((player: SheetCell[], index: number) => {
           // Skip entirely empty rows
           if (!player || !player[nameIdx]) return null;
 
@@ -57,8 +60,8 @@ export default function AuctionTabs({ sets }: AuctionTabsProps) {
               }`}
             >
               <div className="mb-4">
-                <h3 className="font-bold text-lg text-white">{player[nameIdx]}</h3>
-                <p className="text-sm text-gray-400">{role}</p>
+                <h3 className="font-bold text-lg text-white">{player[nameIdx]?.toString()}</h3>
+                <p className="text-sm text-gray-400">{role?.toString()}</p>
               </div>
               
               <div className="flex justify-between items-end border-t border-gray-700/50 pt-3 mt-auto">
@@ -71,7 +74,7 @@ export default function AuctionTabs({ sets }: AuctionTabsProps) {
                 <div className="text-right">
                   <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Sold To</p>
                   <p className={`text-sm font-bold tracking-wide uppercase ${isUnsold ? 'text-gray-500' : 'text-indigo-400'}`}>
-                    {isUnsold ? 'UNSOLD' : rawSoldTo}
+                    {isUnsold ? 'UNSOLD' : rawSoldTo?.toString()}
                   </p>
                 </div>
               </div>
