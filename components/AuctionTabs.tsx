@@ -2,43 +2,70 @@
 
 import { useState } from 'react';
 
-interface Set {
-  id: string;
-  label: string;
-  players: (string | number)[][];
-}
-
-export default function AuctionTabs({ sets }: { sets: Set[] }) {
+export default function AuctionTabs({ sets }: { sets: any[] }) {
   const [activeTab, setActiveTab] = useState(sets[0]?.id || '');
-
   const currentSet = sets.find(set => set.id === activeTab);
 
-  // Helper function to safely parse player data
-  const parsePlayerData = (player: (string | number)[]) => {
-    if (!player || player.length < 5) return null;
-    
-    const name = String(player[0] || '').trim();
-    const role = String(player[1] || '').trim();
-    const basePrice = player[2];
-    const soldPrice = player[3];
-    const soldTo = String(player[4] || '').trim().toUpperCase();
-    
-    // Handle TRUE/FALSE values - convert to proper sold status
-    let isSold = true;
-    if (soldTo === 'FALSE' || soldTo === '' || !soldTo) {
-      isSold = false;
-    } else if (soldTo === 'TRUE') {
-      isSold = true; // Mark as sold but use soldTo field
+  const renderGrid = () => {
+    if (!currentSet?.players || currentSet.players.length <= 1) {
+      return (
+        <div className="flex items-center justify-center h-40">
+          <p className="text-gray-500 italic">No players recorded in this set yet.</p>
+        </div>
+      );
     }
-    
-    return {
-      name,
-      role,
-      basePrice,
-      soldPrice: soldPrice && soldPrice !== '' ? `₹${soldPrice} Cr` : '-',
-      soldTo: isSold && soldTo !== 'TRUE' ? soldTo : (isSold ? 'SOLD' : 'UNSOLD'),
-      isSold: isSold && soldTo !== 'TRUE'
-    };
+
+    // DYNAMICALLY FIND COLUMN INDICES BASED ON SHEET HEADERS
+    const headers = currentSet.players[0].map((h: string) => h ? h.toString().toUpperCase().trim() : '');
+    const nameIdx = 0; 
+    const roleIdx = headers.indexOf('ROLE');
+    const soldPriceIdx = headers.findIndex((h: string) => h.includes('SOLD PRICE'));
+    const soldToIdx = headers.findIndex((h: string) => h.includes('SOLD TO'));
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {currentSet.players.slice(1).map((player: any[], index: number) => {
+          if (!player || !player[nameIdx]) return null;
+
+          const rawSoldTo = soldToIdx !== -1 ? player[soldToIdx] : null;
+          const isUnsold = !rawSoldTo || rawSoldTo.toString().trim() === "" || rawSoldTo.toString().toUpperCase().includes("UNSOLD");
+          
+          // If the sheet doesn't have a ROLE column, fallback to the sheet name (e.g. "BATTERS")
+          const role = roleIdx !== -1 && player[roleIdx] 
+            ? player[roleIdx] 
+            : currentSet.label.replace(/SET \d+/i, '').trim();
+
+          return (
+            <div 
+              key={index} 
+              className={`flex flex-col justify-between p-5 bg-gray-800/40 shadow-sm rounded-lg border-l-4 ${
+                isUnsold ? 'border-l-gray-600 opacity-60' : 'border-l-indigo-500'
+              }`}
+            >
+              <div className="mb-4">
+                <h3 className="font-bold text-lg text-white">{player[nameIdx]}</h3>
+                <p className="text-sm text-gray-400">{role}</p>
+              </div>
+              
+              <div className="flex justify-between items-end border-t border-gray-700/50 pt-3 mt-auto">
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Final Price</p>
+                  <p className="font-black text-xl text-gray-200">
+                    {soldPriceIdx !== -1 && player[soldPriceIdx] ? `₹${player[soldPriceIdx]} Cr` : '-'}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Sold To</p>
+                  <p className={`text-sm font-bold tracking-wide uppercase ${isUnsold ? 'text-gray-500' : 'text-indigo-400'}`}>
+                    {isUnsold ? 'UNSOLD' : rawSoldTo}
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -62,47 +89,7 @@ export default function AuctionTabs({ sets }: { sets: Set[] }) {
 
       {/* Roster Grid for Selected Tab */}
       <div className="bg-gray-900 rounded-xl border border-gray-800 p-4 md:p-6 shadow-2xl min-h-[50vh]">
-        {currentSet?.players && currentSet.players.length > 1 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {currentSet.players.slice(1).map((player: (string | number)[], index: number) => {
-              const parsed = parsePlayerData(player);
-              if (!parsed || !parsed.name) return null;
-
-              return (
-                <div 
-                  key={index} 
-                  className={`flex flex-col justify-between p-5 bg-gray-800/40 shadow-sm rounded-lg border-l-4 transition-all ${
-                    parsed.isSold ? 'border-l-indigo-500 hover:bg-gray-800/60' : 'border-l-gray-600 opacity-75 hover:opacity-85'
-                  }`}
-                >
-                  <div className="mb-4">
-                    <h3 className="font-bold text-lg text-white">{parsed.name}</h3>
-                    <p className="text-sm text-gray-400">{parsed.role || 'Unknown Role'}</p>
-                  </div>
-                  
-                  <div className="flex justify-between items-end border-t border-gray-700/50 pt-3 mt-auto">
-                    <div>
-                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Final Price</p>
-                      <p className="font-black text-xl text-gray-200">
-                        {parsed.soldPrice}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">Sold To</p>
-                      <p className={`text-sm font-bold tracking-wide uppercase ${parsed.isSold ? 'text-indigo-400' : 'text-gray-500'}`}>
-                        {parsed.soldTo}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center h-40">
-            <p className="text-gray-500 italic">No players recorded in this set yet.</p>
-          </div>
-        )}
+        {renderGrid()}
       </div>
     </div>
   );

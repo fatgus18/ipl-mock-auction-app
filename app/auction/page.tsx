@@ -3,7 +3,7 @@ import AuctionTabs from '@/components/AuctionTabs';
 
 export const revalidate = 60;
 
-// List the EXACT names of the sheets you want to pull for the auction categories
+// EXACT names of your sheets
 const AUCTION_SETS = [
   "MARQUEE SET",
   "BATTERS SET 1",
@@ -12,11 +12,11 @@ const AUCTION_SETS = [
   "WICKET KEEPERS SET 1",
   "BATTERS SET 2",
   "BOWLERS SET 2",
-  "ALL ROUNDERS SET 2",
+  "ALL ROUNDERS SET 2"
 ];
 
 export default async function AuctionPage() {
-  // Fetch all sheets in parallel for maximum speed
+  // Fetch all sheets in parallel
   const fetchedSets = await Promise.all(
     AUCTION_SETS.map(async (setName) => {
       const data = await getSheetData(`${setName}!A1:E100`);
@@ -38,7 +38,6 @@ export default async function AuctionPage() {
           <p className="text-gray-400 mt-2 font-medium tracking-wide">SOLD PLAYERS BY CATEGORY</p>
         </header>
 
-        {/* Pass the fetched data to the Client Component */}
         <AuctionTabs sets={fetchedSets} />
       </div>
     </main>
