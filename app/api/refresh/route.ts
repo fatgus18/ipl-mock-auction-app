@@ -12,8 +12,6 @@ export async function GET() {
       valuSigningsData,
       captainRegretsData,
       rosterDependencyData,
-      teamListData,
-      advancedAnalyticsData,
     ] = await Promise.all([
       getSheetData('POINTS!I1:I22'),
       getSheetData('POINTS!J1:J10'),
@@ -23,8 +21,6 @@ export async function GET() {
       getSheetData('POINTS!F83:F95'),
       getSheetData('POINTS!F116:F130'),
       getSheetData('POINTS!I59:I75'),
-      getSheetData('POINTS!A1:A250'),
-      getSheetData('POINTS!A1:J240'),
     ]);
 
     return Response.json({
@@ -38,8 +34,6 @@ export async function GET() {
         valueSigings: valuSigningsData || [],
         captainRegrets: captainRegretsData || [],
         rosterDependency: rosterDependencyData || [],
-        teamList: teamListData || [],
-        advancedAnalytics: advancedAnalyticsData || [],
       },
       timestamp: new Date().toISOString(),
     });
