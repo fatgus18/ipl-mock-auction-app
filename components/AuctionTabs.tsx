@@ -2,7 +2,18 @@
 
 import { useState } from 'react';
 
-export default function AuctionTabs({ sets }: { sets: any[] }) {
+// --- STRICT TYPESCRIPT INTERFACES ---
+export interface AuctionSet {
+  id: string;
+  label: string;
+  players: string[][];
+}
+
+interface AuctionTabsProps {
+  sets: AuctionSet[];
+}
+
+export default function AuctionTabs({ sets }: AuctionTabsProps) {
   const [activeTab, setActiveTab] = useState(sets[0]?.id || '');
   const currentSet = sets.find(set => set.id === activeTab);
 
@@ -15,8 +26,10 @@ export default function AuctionTabs({ sets }: { sets: any[] }) {
       );
     }
 
-    // DYNAMICALLY FIND COLUMN INDICES BASED ON SHEET HEADERS
+    // DYNAMICALLY FIND COLUMN INDICES BASED ON EXACT SHEET HEADERS
     const headers = currentSet.players[0].map((h: string) => h ? h.toString().toUpperCase().trim() : '');
+    
+    // We assume Player Name is always Column 0
     const nameIdx = 0; 
     const roleIdx = headers.indexOf('ROLE');
     const soldPriceIdx = headers.findIndex((h: string) => h.includes('SOLD PRICE'));
@@ -24,13 +37,14 @@ export default function AuctionTabs({ sets }: { sets: any[] }) {
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {currentSet.players.slice(1).map((player: any[], index: number) => {
+        {currentSet.players.slice(1).map((player: string[], index: number) => {
+          // Skip entirely empty rows
           if (!player || !player[nameIdx]) return null;
 
           const rawSoldTo = soldToIdx !== -1 ? player[soldToIdx] : null;
           const isUnsold = !rawSoldTo || rawSoldTo.toString().trim() === "" || rawSoldTo.toString().toUpperCase().includes("UNSOLD");
           
-          // If the sheet doesn't have a ROLE column, fallback to the sheet name (e.g. "BATTERS")
+          // If the sheet doesn't have a ROLE column (like BATTERS SET 1), use the sheet's name as the role fallback
           const role = roleIdx !== -1 && player[roleIdx] 
             ? player[roleIdx] 
             : currentSet.label.replace(/SET \d+/i, '').trim();
